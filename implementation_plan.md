@@ -11,8 +11,9 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
 
 ## 3. Technical Architecture
 *   **Frontend:** Flutter (Android/iOS).
-*   **Backend:** Python (FastAPI) hosting the Agent.
-*   **AI Engine:** Google Agent Development Kit (ADK) powered by Gemini.
+*   **Backend Wrapper:** Python (FastAPI) acting as a gateway.
+*   **Agent Service:** Google ADK API Server hosting the Agent.
+*   **AI Engine:** Gemini via Vertex AI / Google AI Studio.
 
 ---
 
@@ -20,10 +21,11 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
 
 ## Phase 1: Backend (The Brain)
 **Goal:** Create a running API that returns a joke.
-1.  **Setup Project:** Initialize Python environment and install dependencies (`google-adk`, `fastapi`, `uvicorn`).
-2.  **Build Agent:** Create a simple ADK Agent with a system instruction: "You are a professional comedian..."
-3.  **API Wrapper:** Create a FastAPI endpoint `POST /joke` that accepts a `topic` and passes it to the Agent.
-4.  **Test:** Verify with `curl` or Postman.
+1.  **Setup Project:** Initialize Python environment and install dependencies (`google-genai-agent-kit`, `fastapi`, `uvicorn`, `requests`).
+2.  **Build Agent:** Create `agent.py` using ADK to define the "Comedian" persona.
+3.  **Run Agent Server:** Use `adk api_server` to expose the agent on a local port (e.g., 8080).
+4.  **Create Wrapper API:** Create `main.py` (FastAPI) on port 8000 to receive requests from Flutter and forward them to the Agent Server.
+5.  **Test:** Verify the flow: `Client -> Wrapper (8000) -> Agent (8080) -> Client`.
 
 ## Phase 2: Frontend (The Face)
 **Goal:** Create the mobile app interface.
