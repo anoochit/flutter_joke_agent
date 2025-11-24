@@ -32,8 +32,10 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
     *   Text Input Field for topic.
     *   "Tell me a joke" button.
     *   Display area for the result.
-3.  **API Integration:** Use `http` package to call the Backend API.
-4.  **State Management:** Simple `setState` to handle loading states and displaying the joke.
+3.  **API Integration:** Implement the 2-step flow:
+    *   Create Session: `POST /apps/{agent_name}/users/{user_id}/sessions/{session_id}`
+    *   Run Agent: `POST /run_sse` with message payload.
+4.  **State Management:** Handle session creation and chat state.
 
 ## Phase 3: Polish & Run
 1.  **Error Handling:** Handle network errors or API timeouts.
@@ -66,10 +68,15 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
   - Create input field and submit button
   - Create display area for jokes
   - *Commit:* `feat(mobile): implement chat interface UI`
-- [ ] **Integrate API**
-  - Implement HTTP service to call backend
-  - Connect UI to the service
-  - *Commit:* `feat(mobile): integrate joke api with UI`
+- [ ] **Integrate API Service**
+  - Implement `ApiService` class to handle HTTP requests
+  - Add method `createSession()`
+  - Add method `sendMessage()` (calling `/run_sse`)
+  - *Commit:* `feat(mobile): implement adk api service with session management`
+- [ ] **Connect UI to Logic**
+  - Call `createSession` on app start
+  - Call `sendMessage` on button press
+  - *Commit:* `feat(mobile): connect ui to adk api`
 
 ## Phase 3: Integration & Polish
 - [ ] **Final Testing & Fixes**
