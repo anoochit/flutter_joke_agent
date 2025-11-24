@@ -1,37 +1,34 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-import requests
 import os
 
-app = FastAPI()
+import uvicorn
+from fastapi import FastAPI
+from google.adk.cli.fast_api import get_fast_api_app
 
-# ADK Server URL (default port is often 8080 or defined by user)
-# We assume the agent server is running on localhost:8080
-AGENT_URL = os.getenv("AGENT_URL", "http://localhost:8080/run")
+# Get the directory where main.py is located
+AGENT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Example session service URI (e.g., SQLite)
+SESSION_SERVICE_URI = "sqlite:///./sessions.db"
+# Example allowed origins for CORS
+ALLOWED_ORIGINS = ["http://localhost", "http://localhost:8080", "*"]
+# Set web=True if you intend to serve a web interface, False otherwise
+SERVE_WEB_INTERFACE = True
 
-class JokeRequest(BaseModel):
-    topic: str
+# Call the function to get the FastAPI app instance
+# Ensure the agent directory name matches your agent folder structure if needed
+# In this case, since agent.py is in the same dir, ADK should pick it up if configured correctly
+app: FastAPI = get_fast_api_app(
+    agents_dir=AGENT_DIR,
+    session_service_uri=SESSION_SERVICE_URI,
+    allow_origins=ALLOWED_ORIGINS,
+    web=SERVE_WEB_INTERFACE,
+)
 
-@app.post("/joke")
-async def tell_joke(req: JokeRequest):
-    try:
-        # The ADK API server typically expects a JSON payload.
-        # For a simple agent, it might just be the input string or a dict.
-        # We'll send it as {"input": ...} which is a common convention.
-        payload = {"input": req.topic}
-        
-        # Call the Agent Service
-        response = requests.post(AGENT_URL, json=payload)
-        response.raise_for_status()
-        
-        # Return the data from the agent
-        return response.json()
-        
-    except requests.exceptions.ConnectionError:
-        raise HTTPException(status_code=503, detail="Agent Service is unavailable. Is 'adk api_server' running?")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# You can add more FastAPI routes or configurations below if needed
+# Example:
+# @app.get("/hello")
+# async def read_root():
+#     return {"Hello": "World"}
 
-@app.get("/health")
-async def health_check():
-    return {"status": "ok"}
+if __name__ == "__main__":
+    # Use the PORT environment variable provided by Cloud Run, defaulting to 8080
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

@@ -11,8 +11,7 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
 
 ## 3. Technical Architecture
 *   **Frontend:** Flutter (Android/iOS).
-*   **Backend Wrapper:** Python (FastAPI) acting as a gateway.
-*   **Agent Service:** Google ADK API Server hosting the Agent.
+*   **Backend:** Python (FastAPI) using ADK Built-in Integration (`get_fast_api_app`).
 *   **AI Engine:** Gemini via Vertex AI / Google AI Studio.
 
 ---
@@ -21,11 +20,10 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
 
 ## Phase 1: Backend (The Brain)
 **Goal:** Create a running API that returns a joke.
-1.  **Setup Project:** Initialize Python environment and install dependencies (`google-genai-agent-kit`, `fastapi`, `uvicorn`, `requests`).
+1.  **Setup Project:** Initialize Python environment and install dependencies (`google-adk`, `fastapi`, `uvicorn`).
 2.  **Build Agent:** Create `agent.py` using ADK to define the "Comedian" persona.
-3.  **Run Agent Server:** Use `adk api_server` to expose the agent on a local port (e.g., 8080).
-4.  **Create Wrapper API:** Create `main.py` (FastAPI) on port 8000 to receive requests from Flutter and forward them to the Agent Server.
-5.  **Test:** Verify the flow: `Client -> Wrapper (8000) -> Agent (8080) -> Client`.
+3.  **Implement Server:** Create `main.py` using `get_fast_api_app` to automatically expose the agent as a FastAPI service.
+4.  **Test:** Verify the API endpoints (e.g., `/agent_name/run`) using `curl` or Postman.
 
 ## Phase 2: Frontend (The Face)
 **Goal:** Create the mobile app interface.
@@ -54,10 +52,10 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
   - Create `agent.py` with basic configuration
   - Define system instructions for "Comedian" persona
   - *Commit:* `feat(backend): implement basic comedian agent using ADK`
-- [ ] **Create API Endpoint**
-  - Setup FastAPI app in `main.py`
-  - Create `POST /joke` endpoint connecting to the agent
-  - *Commit:* `feat(backend): add POST /joke endpoint`
+- [ ] **Create API Server**
+  - Implement `main.py` using `get_fast_api_app`
+  - Configure `AGENT_DIR` and server settings
+  - *Commit:* `feat(backend): implement ADK built-in FastAPI integration`
 
 ## Phase 2: Frontend (The Face)
 - [ ] **Initialize Flutter App**
