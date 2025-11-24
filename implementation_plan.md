@@ -21,9 +21,9 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
 ## Phase 1: Backend (The Brain)
 **Goal:** Create a running API that returns a joke.
 1.  **Setup Project:** Initialize Python environment and install dependencies (`google-adk`, `fastapi`, `uvicorn`).
-2.  **Build Agent:** Create `agent.py` using ADK to define the "Comedian" persona.
-3.  **Implement Server:** Create `main.py` using `get_fast_api_app` to automatically expose the agent as a FastAPI service.
-4.  **Test:** Verify the API endpoints (e.g., `/agent_name/run`) using `curl` or Postman.
+2.  **Build Agent:** Create `joke_agent/agent.py` using `LlmAgent` (with `instruction` and `name`).
+3.  **Implement Server:** Create `main.py` using `get_fast_api_app` to automatically expose the agent.
+4.  **Test:** Verify the API endpoints (e.g., `/list-apps`, `/run_sse`).
 
 ## Phase 2: Frontend (The Face)
 **Goal:** Create the mobile app interface.
@@ -33,9 +33,11 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
     *   "Tell me a joke" button.
     *   Display area for the result.
 3.  **API Integration:** Implement the 2-step flow:
+    *   Fetch Agent Name: `GET /list-apps`
     *   Create Session: `POST /apps/{agent_name}/users/{user_id}/sessions/{session_id}`
     *   Run Agent: `POST /run_sse` with message payload.
-4.  **State Management:** Handle session creation and chat state.
+4.  **Response Handling:** Parse SSE format (`data: {...}`) to extract the joke text.
+5.  **State Management:** Handle session creation and chat state.
 
 ## Phase 3: Polish & Run
 1.  **Error Handling:** Handle network errors or API timeouts.
@@ -46,40 +48,41 @@ A simple Flutter mobile application that interfaces with an AI Agent (built with
 # Checklist & Git Commit Strategy
 
 ## Phase 1: Backend (The Brain)
-- [ ] **Setup Project Structure**
+- [x] **Setup Project Structure**
   - Initialize git repository
   - Create virtual environment and `requirements.txt`
   - *Commit:* `chore(backend): init project structure and dependencies`
-- [ ] **Implement ADK Agent**
-  - Create `agent.py` with basic configuration
-  - Define system instructions for "Comedian" persona
+- [x] **Implement ADK Agent**
+  - Create `joke_agent/agent.py`
+  - Use `LlmAgent` with `instruction`
+  - Define system instructions for "Comedian" persona (Multi-language support)
   - *Commit:* `feat(backend): implement basic comedian agent using ADK`
-- [ ] **Create API Server**
+- [x] **Create API Server**
   - Implement `main.py` using `get_fast_api_app`
   - Configure `AGENT_DIR` and server settings
   - *Commit:* `feat(backend): implement ADK built-in FastAPI integration`
 
 ## Phase 2: Frontend (The Face)
-- [ ] **Initialize Flutter App**
+- [x] **Initialize Flutter App**
   - Create new Flutter project
   - Clean up default boilerplate code
   - *Commit:* `chore(mobile): init flutter project`
-- [ ] **Build UI Components**
+- [x] **Build UI Components**
   - Create input field and submit button
   - Create display area for jokes
   - *Commit:* `feat(mobile): implement chat interface UI`
-- [ ] **Integrate API Service**
+- [x] **Integrate API Service**
   - Implement `ApiService` class to handle HTTP requests
   - Add method `createSession()`
   - Add method `sendMessage()` (calling `/run_sse`)
   - *Commit:* `feat(mobile): implement adk api service with session management`
-- [ ] **Connect UI to Logic**
+- [x] **Connect UI to Logic**
   - Call `createSession` on app start
   - Call `sendMessage` on button press
   - *Commit:* `feat(mobile): connect ui to adk api`
 
 ## Phase 3: Integration & Polish
-- [ ] **Final Testing & Fixes**
+- [x] **Final Testing & Fixes**
   - Verify end-to-end flow
   - Handle loading states and errors
   - *Commit:* `fix(app): handle loading states and api errors`

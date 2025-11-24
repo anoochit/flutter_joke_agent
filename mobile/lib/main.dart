@@ -24,15 +24,40 @@ class AiComedyClubApp extends StatelessWidget {
 }
 
 class AdkService {
-  // Android Emulator uses 10.0.2.2 to access localhost
-  static const String baseUrl = 'http://10.0.2.2:8080';
+  // For Web or iOS Simulator, use 127.0.0.1 or localhost
+  static const String baseUrl = 'http://127.0.0.1:8080';
 
-  // Assuming the agent name matches the folder name or default configuration
-  // You might need to adjust this based on how ADK registers the agent
-  static const String agentName = 'default';
+  // Will be fetched dynamically
+  String agentName = 'default';
 
   final String userId = 'user_${const Uuid().v4().substring(0, 8)}';
   final String sessionId = 'session_${const Uuid().v4().substring(0, 8)}';
+
+  Future<void> initialize() async {
+    await fetchAgentName();
+    await createSession();
+  }
+
+  Future<void> fetchAgentName() async {
+    final url = Uri.parse('$baseUrl/list-apps');
+    print('Fetching agent name from: $url');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> apps = jsonDecode(response.body);
+        if (apps.isNotEmpty) {
+          agentName = apps.first.toString();
+          print('Agent name found: $agentName');
+        } else {
+          print('No apps found, using default: $agentName');
+        }
+      } else {
+        print('Failed to list apps: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching agent name: $e');
+    }
+  }
 
   Future<void> createSession() async {
     final url = Uri.parse(
@@ -50,7 +75,6 @@ class AdkService {
         print('Session created successfully');
       } else {
         print('Failed to create session: ${response.body}');
-        // Don't throw here, sometimes session creation is implicit or idempotent
       }
     } catch (e) {
       print('Error creating session: $e');
@@ -83,13 +107,26 @@ class AdkService {
       );
 
       if (response.statusCode == 200) {
-        // Parse the response. The structure depends on ADK output.
-        // Usually it returns a JSON stream or a JSON object.
-        // Since we set streaming: false, we expect a JSON object.
         print('Response body: ${response.body}');
 
-        // Simple parsing logic - adjust based on actual response structure
-        // If response is SSE format but not streaming, it might still need parsing
+        // Parse SSE format: data: {...}
+        final body = response.body.trim();
+        if (body.startsWith('data: ')) {
+          final jsonStr = body.substring(6); // Remove 'data: ' prefix
+          try {
+            final jsonData = jsonDecode(jsonStr);
+            // Extract text from content.parts[0].text
+            if (jsonData['content'] != null &&
+                jsonData['content']['parts'] != null &&
+                (jsonData['content']['parts'] as List).isNotEmpty) {
+              return jsonData['content']['parts'][0]['text'].toString();
+            }
+          } catch (e) {
+            print('Error parsing JSON from SSE: $e');
+          }
+        }
+
+        // Fallback or return raw body if parsing fails
         return response.body;
       } else {
         throw Exception(
@@ -122,7 +159,7 @@ class _ComedyHomePageState extends State<ComedyHomePage> {
   }
 
   Future<void> _initializeSession() async {
-    await _adkService.createSession();
+    await _adkService.initialize();
   }
 
   Future<void> _getJoke() async {
