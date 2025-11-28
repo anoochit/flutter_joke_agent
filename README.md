@@ -38,7 +38,7 @@ flutter pub get
 flutter run
 ```
 
-### Docker Compose
+### 🐋 Docker Compose
 
 To run the application using Docker Compose:
 
