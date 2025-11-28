@@ -25,7 +25,7 @@ class AiComedyClubApp extends StatelessWidget {
 
 class AdkService {
   // For Web or iOS Simulator, use 127.0.0.1 or localhost
-  static const String baseUrl = 'http://127.0.0.1:8080';
+  static const String baseUrl = 'http://10.0.2.2:8080';
 
   // Will be fetched dynamically
   String agentName = 'default';
