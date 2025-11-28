@@ -38,6 +38,22 @@ flutter pub get
 flutter run
 ```
 
+### Docker Compose
+
+To run the application using Docker Compose:
+
+1.  **Build and Start Services:**
+    Navigate to the project root directory and run:
+    ```bash
+    docker-compose up --build
+    ```
+    This command will build the Docker images for both the backend and frontend services (if not already built) and then start the containers.
+
+2.  **Access the Application:**
+    *   **Frontend (Flutter Web):** Open your web browser and navigate to `http://localhost`.
+    *   **Backend (ADK Agent):** The backend service will be accessible at `http://localhost:8000`. This is primarily for internal communication with the frontend.
+
+
 The UI will display a simple chat‑like interface. Type a request such as *"Tell me a joke about cats"* and the agent will reply with a freshly generated joke.
 
 ## 🛠️ Development
